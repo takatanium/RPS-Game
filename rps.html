@@ -1,115 +1,146 @@
 <html>
+
 <head>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </head>
+
 <body>
+    <div class="container">
+        <div class="col-xs-12 text-center">
+            <h1> ROOK, PAPER, SCISSORS</h1>
+            <button type="button" class="btn btn-default btn-lg" id="rook" onClick="rps(0)">
+                <span class="glyphicon glyphicon-tower" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default btn-lg" id="paper" onClick="rps(1)">
+                <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default btn-lg" id="scissors" onClick="rps(2)">
+                <span class="glyphicon glyphicon-scissors" aria-hidden="true"></span>
+            </button>
+            <br>
+            <br>
+            <div class="well">
+                <span id="selections"></span>
+                <br>
+                <br>
+                <span id="winner-text"></span>
+            </div>
+            <div class="well">
+                <span id="history-text"></span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar progress-bar-success" id="player_bar">
+                </div>
+                <div class="progress-bar progress-bar-warning" id="draw_bar">
+                </div>
+                <div class="progress-bar progress-bar-danger" id="computer_bar">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    var gameHistory = [0, 0, 0]; // tie, win, loss
+    var totalGames = 0;
+    //check for keyboard events r, p, or s
+    document.addEventListener('keyup', function(event) {
+        var playerKey = event.key;
+        if (playerKey === 'r' || playerKey === 'p' || playerKey === 's') {
+            rps(keyToNum(playerKey));
+        } else {
+            alert('Not an option...');
+        }
+    });
 
-<div class="container">
-	<div class="col-xs-12 text-center">
-		<h1> ROOK, PAPER, SCISSORS</h1>
-		<button type="button" class="btn btn-default btn-lg" id="rook" onClick="rps(0)">
-		  <span class="glyphicon glyphicon-tower" aria-hidden="true"></span> 
-		</button>
-		<button type="button" class="btn btn-default btn-lg" id="paper" onClick="rps(1)">
-		  <span class="glyphicon glyphicon-file" aria-hidden="true"></span> 
-		</button>
-		<button type="button" class="btn btn-default btn-lg" id="scissors" onClick="rps(2)">
-		  <span class="glyphicon glyphicon-scissors" aria-hidden="true"></span> 
-		</button>
-		<br><br>
-		
-		<div class="well">
-			<span id="selections"></span><br><br>
-			<span id="winner-text"></span>
-		</div>
+    function rps(playerPick) {
+        var winnerText = document.getElementById("winner-text");
+        var computerPick = randomNum();
 
-		<div class="well">
-			<span id="history-text"></span>
-		</div>
-	</div>
-</div>
-<script>
+        var selectionsText = document.getElementById("selections");
 
-var gameHistory = [0, 0, 0]; // tie, win, loss
+        selectionsText.innerHTML = "<strong>Computer: </strong><span class='" + numToGlyph(computerPick) + "'aria-hidden='true'></span>" + "<strong>&nbsp;&nbsp;&nbsp;&nbsp;Player: </strong><span class='" + numToGlyph(playerPick) + "'aria-hidden='true'></span>";
 
-//check for keyboard events r, p, or s
-document.addEventListener('keyup', function(event) {
-	var playerKey = event.key;
-	if (playerKey === 'r' || playerKey === 'p' || playerKey === 's') {
-		rps(keyToNum(playerKey));
-	}
-	else {
-		alert('Not an option...');
-	}
-});
+        var checkWin = playerPick - computerPick;
 
-function rps(playerPick) {
-	var winnerText = document.getElementById("winner-text");
-	var computerPick = randomNum();
-	
-	var selectionsText = document.getElementById("selections");
+        if (checkWin == 0) {
+            winnerText.innerHTML = "<strong>Tie!</strong>";
+            updateHistory(0);
+        } else if (checkWin == 1 || checkWin == -2) {
+            winnerText.innerHTML = "<strong>Player Wins!</strong>";
+            updateHistory(1);
+        } else {
+            winnerText.innerHTML = "<strong>Computer Wins!</strong>";
+            updateHistory(2);
+        }
 
-	selectionsText.innerHTML = "<strong>Computer: </strong><span class='"+ numToGlyph(computerPick)+"'aria-hidden='true'></span>" + "<strong>&nbsp;&nbsp;&nbsp;&nbsp;Player: </strong><span class='"+ numToGlyph(playerPick)+"'aria-hidden='true'></span>";
+        updateProgressBar();
+    }
 
-	var checkWin = playerPick - computerPick;
+    function randomNum() {
+        var rand = Math.floor(Math.random() * 3);
+        // console.log(rand);
+        return rand;
+    }
 
-	if (checkWin == 0) {
-		winnerText.innerHTML = "<strong>Tie!</strong>";
-		updateHistory(0);
-	}
-	else if (checkWin == 1 || checkWin == -2) {
-		winnerText.innerHTML = "<strong>Player Wins!</strong>";
-		updateHistory(1);
-	}
-	else {
-		winnerText.innerHTML = "<strong>Computer Wins!</strong>";
-		updateHistory(2);
-	}
-}
+    function numToGlyph(i) {
+        if (i == 0) {
+            return "glyphicon glyphicon-tower";
+        }
+        if (i == 1) {
+            return "glyphicon glyphicon-file";
+        }
+        if (i == 2) {
+            return "glyphicon glyphicon-scissors";
+        }
+    }
 
-function randomNum() {
-	var rand = Math.floor(Math.random() * 3);
-	// console.log(rand);
-	return rand;
-}
+    function keyToNum(k) {
+        if (k === 'r') {
+            return 0;
+        }
+        if (k === 'p') {
+            return 1;
+        }
+        if (k === 's') {
+            return 2;
+        }
+    }
 
-function numToGlyph(i) {
-	if (i==0) {
-		return "glyphicon glyphicon-tower";
-	}
-	if (i==1) {
-		return "glyphicon glyphicon-file";
-	}
-	if (i==2) {
-		return "glyphicon glyphicon-scissors";
-	}
-}
+    function updateHistory(i) {
+        var historyText = document.getElementById("history-text");
 
-function keyToNum(k) {
-	if (k === 'r') {
-		return 0;
-	}	
-	if (k === 'p') {
-		return 1;
-	}	
-	if (k === 's') {
-		return 2;
-	}
-}
+        gameHistory[i]++;
+        historyText.innerHTML = "<strong>Ties: " + gameHistory[0] + " Wins: " + gameHistory[1] + " Losses: " + gameHistory[2];
+    }
 
-function updateHistory (i) {
-	var historyText = document.getElementById("history-text");
+    function updateProgressBar() {
+        totalGames += 1;
 
-	gameHistory[i]++;
-	historyText.innerHTML = "<strong>Ties: " + gameHistory[0] + " Wins: " + gameHistory[1] + " Losses: " + gameHistory[2];
-}
-</script>	
+        var playerBar = document.getElementById("player_bar");
+        var playerWinPercent = ((gameHistory[1] / totalGames) * 100);
+        var playerStringPercent = playerWinPercent + '%';
+        playerBar.style.width = playerStringPercent;
+        var playerBarText = playerWinPercent.toFixed(2) + '%';
+        playerBar.innerHTML = playerBarText;
 
+        var computerBar = document.getElementById("computer_bar");
+        var computerWinPercent = ((gameHistory[2] / totalGames) * 100);
+        var computerStringPercent = computerWinPercent + '%';
+        computerBar.style.width = computerStringPercent;
+        var computerBarText = computerWinPercent.toFixed(2) + '%';
+        computerBar.innerHTML = computerBarText;
+
+        var drawBar = document.getElementById("draw_bar");
+        var drawPercent = ((gameHistory[0] / totalGames) * 100);
+        var drawStringPercent = drawPercent + '%';
+        drawBar.style.width = drawStringPercent;
+        var drawBarText = drawPercent.toFixed(2) + '%';
+        drawBar.innerHTML = drawBarText;
+    }
+    </script>
 </body>
+
 </html>
