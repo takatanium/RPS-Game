@@ -11,7 +11,7 @@
 <body>
 
 <div class="container">
-	<div class="col-lg-12 text-center">
+	<div class="col-xs-12 text-center">
 		<h1> ROOK, PAPER, SCISSORS</h1>
 		<button type="button" class="btn btn-default btn-lg" id="rook" onClick="rps(0)">
 		  <span class="glyphicon glyphicon-tower" aria-hidden="true"></span> 
@@ -28,10 +28,26 @@
 			<span id="selections"></span><br><br>
 			<span id="winner-text"></span>
 		</div>
+
+		<div class="well">
+			<span id="history-text"></span>
+		</div>
 	</div>
 </div>
 <script>
 
+var gameHistory = [0, 0, 0]; // tie, win, loss
+
+//check for keyboard events r, p, or s
+document.addEventListener('keyup', function(event) {
+	var playerKey = event.key;
+	if (playerKey === 'r' || playerKey === 'p' || playerKey === 's') {
+		rps(keyToNum(playerKey));
+	}
+	else {
+		alert('Not an option...');
+	}
+});
 
 function rps(playerPick) {
 	var winnerText = document.getElementById("winner-text");
@@ -41,34 +57,25 @@ function rps(playerPick) {
 
 	selectionsText.innerHTML = "<strong>Computer: </strong><span class='"+ numToGlyph(computerPick)+"'aria-hidden='true'></span>" + "<strong>&nbsp;&nbsp;&nbsp;&nbsp;Player: </strong><span class='"+ numToGlyph(playerPick)+"'aria-hidden='true'></span>";
 
-	
-	if (playerPick == 0 && computerPick == 1) {
-		winnerText.innerHTML = "<strong>Computer Wins!</strong>";		
+	var checkWin = playerPick - computerPick;
+
+	if (checkWin == 0) {
+		winnerText.innerHTML = "<strong>Tie!</strong>";
+		updateHistory(0);
 	}
-	else if (playerPick == 1 && computerPick == 2) {
-		winnerText.innerHTML = "<strong>Computer Wins!</strong>";
-	}
-	else if (playerPick == 2 && computerPick == 0) {
-		winnerText.innerHTML = "<strong>Computer Wins!</strong>";
-	}
-	else if (computerPick == 0 && playerPick == 1) {
-		winnerText.innerHTML = "<strong>Player Wins!</strong>";	
-	}
-	else if (computerPick == 1 && playerPick == 2) {
-		winnerText.innerHTML = "<strong>Player Wins!</strong>";	
-	}
-	else if (computerPick == 2 && playerPick == 0) {
-		winnerText.innerHTML = "<strong>Player Wins!</strong>";	
+	else if (checkWin == 1 || checkWin == -2) {
+		winnerText.innerHTML = "<strong>Player Wins!</strong>";
+		updateHistory(1);
 	}
 	else {
-		winnerText.innerHTML = "<strong>Tie!</strong>";
+		winnerText.innerHTML = "<strong>Computer Wins!</strong>";
+		updateHistory(2);
 	}
 }
- 
 
 function randomNum() {
 	var rand = Math.floor(Math.random() * 3);
-	console.log(rand);
+	// console.log(rand);
 	return rand;
 }
 
@@ -84,6 +91,24 @@ function numToGlyph(i) {
 	}
 }
 
+function keyToNum(k) {
+	if (k === 'r') {
+		return 0;
+	}	
+	if (k === 'p') {
+		return 1;
+	}	
+	if (k === 's') {
+		return 2;
+	}
+}
+
+function updateHistory (i) {
+	var historyText = document.getElementById("history-text");
+
+	gameHistory[i]++;
+	historyText.innerHTML = "<strong>Ties: " + gameHistory[0] + " Wins: " + gameHistory[1] + " Losses: " + gameHistory[2];
+}
 </script>	
 
 </body>
